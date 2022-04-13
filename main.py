@@ -58,6 +58,33 @@ class Cube():
 # Just the perspective to handle things like the FOV
 PERSPECTIVE = glm.perspective(glm.radians(90), 1, 1, 50)
 
+def calculate_models():
+    global points
+    global normalpoints
+    global rotate
+
+    points = []
+    normalpoints = []
+    # deals with where to put each vector
+    for vertex in model.vertices:
+            vector_vertex = glm.vec4(vertex, 1)
+            scale_matrix = glm.scale((50, 50, 50))
+            translate_matrix = glm.translate((0, 0, 0))
+            rotation_matrix = glm.rotate(rotate, (1, 1, 1))
+            model_matrix = translate_matrix * rotation_matrix * scale_matrix
+            camera_pos_matrix = glm.translate((0, 0, 0))
+            camera_look_matrix = glm.lookAt((0, 0, 0), (0, 0, -1),  (0, 1, 0))
+            view_matrix = camera_look_matrix * camera_pos_matrix
+            mvp_matrix = PERSPECTIVE * view_matrix * model_matrix
+            points.append(mvp_matrix * vector_vertex)
+    
+    # calculates where each normal points
+    for normal in model.normals:
+            vector_normal = glm.vec4(normal, 0)
+            rotation_matrix = glm.rotate(rotate, (1, 1, 1))
+            normalpoints.append(rotation_matrix * vector_normal)
+
+
 # to handle the actual drawing
 def draw_models(model, points, normals):
     # an iterator is needed for this type of stuff
@@ -66,7 +93,7 @@ def draw_models(model, points, normals):
         normal = normals[i]            
         
         # primitive backface culling so that we cant see the faces behind other faces
-        if normal[2] <= 0:
+        if normal.z <= 0:
             i += 1
             continue
         draw.penup()
@@ -89,31 +116,23 @@ def draw_models(model, points, normals):
         i += 1
 
 
-print(glm.vec4(Cube.vertices[0], 1))
 # Main function
 def main():
+    global model
     model = Cube()
-    rotate = 1
+
+    global rotate
+    rotate = 0
+
+    global points
+    global normalpoints
+    points = []
+    normalpoints = []
+
     while True:
         draw.clear()
-        points = []
-        normalpoints = []
-        rotate += 0.001
-        for vertex in model.vertices:
-                vector_vertex = glm.vec4(vertex, 1)
-                scale_matrix = glm.scale((50, 50, 50))
-                translate_matrix = glm.translate((0, 0, 0))
-                rotation_matrix = glm.rotate(rotate, (1, 1, 1))
-                model_matrix = translate_matrix * rotation_matrix * scale_matrix
-                camera_pos_matrix = glm.translate((0, 0, 0))
-                camera_look_matrix = glm.lookAt((0, 0, 0), (0, 0, -1),  (0, 1, 0))
-                view_matrix = camera_look_matrix * camera_pos_matrix
-                mvp_matrix = PERSPECTIVE * view_matrix * model_matrix
-                points.append(mvp_matrix * vector_vertex)
-        for normal in model.normals:
-                vector_normal = glm.vec4(normal, 0)
-                rotation_matrix = glm.rotate(rotate, (1, 1, 1))
-                normalpoints.append(rotation_matrix * vector_normal)
+        rotate += 0.005
+        calculate_models()
         draw_models(model, points, normalpoints)
         turtle.update()
 main()
