@@ -56,9 +56,29 @@ class Cube():
         'magenta',
     ]
 
-# Just the perspective to handle things like the FOV
+# just the perspective to handle things like the FOV
 PERSPECTIVE = glm.perspective(glm.radians(90), 1, 1, 50)
 
+# area for bouncing off of
+PHYSICS_BOX = (640, 480)
+
+# moves the cube aroun
+def move_objects():
+    global position
+    global movedir
+    global rotate
+
+    # checks for collision between model and screen
+    position = [(position[0] + movedir[0]), (position[1] + movedir[1]), position[2]]
+    if abs(position[0]) >= PHYSICS_BOX[0] // 2:
+        movedir[0] *= -1 
+    elif abs(position[1]) >= PHYSICS_BOX[1] // 2:
+        movedir[1] *= -1 
+    else:
+        rotate += 0.01
+    
+
+# calculates where each vertex will be in screenspace
 def calculate_models():
     global points
     global normalpoints
@@ -68,14 +88,20 @@ def calculate_models():
     normalpoints = []
     # deals with where to put each vector
     for vertex in model.vertices:
+
+            # scales up and moves the object
             vector_vertex = glm.vec4(vertex, 1)
             scale_matrix = glm.scale((50, 50, 50))
-            translate_matrix = glm.translate((0, 0, 0))
+            translate_matrix = glm.translate((position))
             rotation_matrix = glm.rotate(rotate, (1, 1, 1))
             model_matrix = translate_matrix * rotation_matrix * scale_matrix
+
+            # moves camera around
             camera_pos_matrix = glm.translate((0, 0, 0))
             camera_look_matrix = glm.lookAt((0, 0, 0), (0, 0, -1),  (0, 1, 0))
             view_matrix = camera_look_matrix * camera_pos_matrix
+
+            # adjusts camera space to screen space
             mvp_matrix = PERSPECTIVE * view_matrix * model_matrix
             points.append(mvp_matrix * vector_vertex)
     
@@ -117,24 +143,32 @@ def draw_models(model, points, normals):
         i += 1
 
 
+# setup of the object itself
 model = Cube()
-
 rotate = 0
+position = [0, 0, 0]
+movedir = [1, 1]
 
 def main():
+    # few global declarations to get out of the way
     global points
     global normalpoints
     global rotate
-    points = []
-    normalpoints = []
+    global position
+    global movedir
+
+    # clear buffers
     draw.clear()
-    rotate += 0.01
+
+    # callse each function
+    move_objects()
     calculate_models()
     draw_models(model, points, normalpoints)
     turtle.update()
+
+    # make exiting work via recursion
     screen.ontimer(main, (1000 // 60))
 
+# loops
 main()
 screen.mainloop()
-
-

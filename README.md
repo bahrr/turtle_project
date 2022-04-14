@@ -1,1 +1,1 @@
-Currently just a rotating cube on a black screen but I intend on adding more to it
+just a cube bouncing off of edges like the dvd screensaver
