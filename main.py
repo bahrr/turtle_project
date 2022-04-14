@@ -1,4 +1,13 @@
-#! usr/bin/python
+##########################################
+# Ivan Gorylev
+# Computer Science 20
+# April 26, 2022
+#
+# Turtle Poject
+# Spins and bounces a cube around
+# Install pyglm (not glm as its for graphing or something)
+##########################################
+
 import turtle
 from OpenGL.GL import *
 import glm
@@ -62,7 +71,7 @@ PERSPECTIVE = glm.perspective(glm.radians(90), 1, 1, 50)
 # area for bouncing off of
 PHYSICS_BOX = (640, 480)
 
-# moves the cube aroun
+# moves the cube around
 def move_objects():
     global position
     global movedir
