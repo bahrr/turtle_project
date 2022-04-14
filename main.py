@@ -1,3 +1,4 @@
+#! usr/bin/python
 import turtle
 from OpenGL.GL import *
 import glm
@@ -116,26 +117,24 @@ def draw_models(model, points, normals):
         i += 1
 
 
-# Main function
+model = Cube()
+
+rotate = 0
+
 def main():
-    global model
-    model = Cube()
-
-    global rotate
-    rotate = 0
-
     global points
     global normalpoints
+    global rotate
     points = []
     normalpoints = []
+    draw.clear()
+    rotate += 0.01
+    calculate_models()
+    draw_models(model, points, normalpoints)
+    turtle.update()
+    screen.ontimer(main, (1000 // 60))
 
-    while True:
-        draw.clear()
-        rotate += 0.005
-        calculate_models()
-        draw_models(model, points, normalpoints)
-        turtle.update()
 main()
-
+screen.mainloop()
 
 
