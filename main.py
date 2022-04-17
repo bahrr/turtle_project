@@ -9,7 +9,6 @@
 ##########################################
 
 import turtle
-from OpenGL.GL import *
 import glm
 
 # Set up screen
